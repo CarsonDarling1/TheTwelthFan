@@ -9,6 +9,7 @@ import AllLeaguesPage from "./pages/AllLeaguesPage.tsx";
 import LeaguePage from "./pages/LeaguePage.tsx";
 import AllTeamsPage from "./pages/AllTeamsPage.tsx";
 import TeamPage from "./pages/TeamPage.tsx";
+import DraftPage from "./pages/DraftPage.tsx";
 
 const rootRoute = createRootRoute({
   component: RootLayout, // Use the separate layout component
@@ -123,8 +124,31 @@ const teamRoute = createRoute({
   },
 });
 
+export const draftRoute = createRoute({
+  getParentRoute: () => rootRoute, // ⬅️ no longer a child of leagueRoute
+  path: "/draft/$id/$name",        // ⬅️ full path
+  component: DraftPage,
+  beforeLoad: async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      return redirect({ to: "/login" });
+    }
+  },
+});
+
 // Create the route tree
-const routeTree = rootRoute.addChildren([homeRoute, aboutRoute, loginRoute, dashboardRoute, logoutRoute, allLeaguesRoute, leagueRoute, allTeamsRoute, teamRoute]);
+const routeTree = rootRoute.addChildren([
+  homeRoute,
+  aboutRoute,
+  loginRoute,
+  dashboardRoute,
+  logoutRoute,
+  allLeaguesRoute,
+  leagueRoute,       // standalone
+  draftRoute,        // ⬅️ now a sibling route
+  allTeamsRoute,
+  teamRoute,
+]);
 
 // Create the router instance
 export const router = createRouter({ routeTree });

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useNavigate, Outlet } from '@tanstack/react-router';
+import {draftRoute} from "../routes";
 import {
   Table,
   TableHeader,
@@ -17,8 +19,14 @@ interface TeamData {
   userid: number;
 }
 
+interface LeagueData {
+  id: number;
+  name: string;
+}
+
 export default function LeaguePage() {
   const [teamData, setTeamData] = useState<TeamData[]>([]);
+  const navigate = useNavigate();
 
 useEffect(() => {
   const token = localStorage.getItem("authToken");
@@ -40,6 +48,16 @@ useEffect(() => {
       console.error('Error fetching team data:', error);
     });
 }, []);
+
+const handleDraftClick = (league: LeagueData) => {
+  navigate({
+    to: draftRoute.to,
+    params: {
+      id: String(league.id),
+      name: league.name,
+    },
+  });
+};
 
   const renderTeamRows = () => {
     return teamData.map((team) => (
@@ -68,6 +86,13 @@ useEffect(() => {
           {renderTeamRows()}
         </TableBody>
       </Table>
+      <div className='flex justify-center'>
+          <button 
+          onClick={() => handleDraftClick({ id: 3, name: 'League' })}
+          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
+          >Start Draft</button>
+        <Outlet />
+        </div>
     </div>
   );
 }
